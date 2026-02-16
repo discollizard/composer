@@ -230,23 +230,21 @@ EOT
 
         //add packages to be installed in package.json
         if(!is_null($requiredPackagesString) && strlen($requiredPackagesString) > 0){
-            $rootPackage = $composer->getPackage();
 
             $requiredPackagesArrayRaw = explode(',', $requiredPackagesString);
-            $requiredPackagesArrayTreated = [];
+
+            $configSource = new JsonConfigSource(new JsonFile('composer.json'));
+
             foreach($requiredPackagesArrayRaw as $nameColonConstraint){
                 $nameColonConstraintExploded = explode(':', $nameColonConstraint); 
-                $requiredPackagesArrayTreated[$nameColonConstraintExploded[0]] = $nameColonConstraintExploded[1];
-            }
+                $nameColonConstraintExploded[1] ??= $nameColonConstraintExploded[1] ?? '*';
 
-            $loader = new ArrayLoader();
-            $newLinks = $loader->parseLinks($rootPackage->getName(), $rootPackage->getPrettyVersion(), BasePackage::$supportedLinkTypes['require']['method'], $requiredPackagesArrayTreated);
-            //TODO: merge new requirements with root package's
-            // $links[$requireKey] = array_merge($links[$requireKey], $newLinks);
-            // foreach ($requirements as $package => $constraint) {
-            //     unset($links[$removeKey][$package]);
-            // }
-            // $rootPackage->setRequires($links['require']);
+                $configSource->addLink(
+                    'require',
+                    $nameColonConstraintExploded[0],
+                    $nameColonConstraintExploded[1]
+                );
+            }
         }
 
         $process = $composer->getLoop()->getProcessExecutor();
