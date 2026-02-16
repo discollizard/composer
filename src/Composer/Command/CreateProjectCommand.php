@@ -237,7 +237,7 @@ EOT
 
             foreach($requiredPackagesArrayRaw as $nameColonConstraint){
                 $nameColonConstraintExploded = explode(':', $nameColonConstraint); 
-                $nameColonConstraintExploded[1] ??= $nameColonConstraintExploded[1] ?? '*';
+                $nameColonConstraintExploded[1] = $nameColonConstraintExploded[1] ?? '*';
 
                 $configSource->addLink(
                     'require',
